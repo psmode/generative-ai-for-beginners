@@ -1,36 +1,31 @@
-// Adopting the default GitHub codespaces-jupyter template as starter
-// https://github.com/github/codespaces-jupyter
+// Lightweight devcontainer with Python 3.11 preinstalled (no Conda layer)
+// This avoids the "no space left on device" error seen with the universal image + features.
 {
-	"name": "Generative AI For Beginners",
-	"image": "mcr.microsoft.com/devcontainers/universal:2.11.2",
+  "name": "Generative AI For Beginners",
+  "image": "mcr.microsoft.com/devcontainers/python:3.11-bookworm",
 
-	// ? NEW: Pin Python 3.11 (avoids distutils break on 3.12)
-	"features": {
-		"ghcr.io/devcontainers/features/python:1": {
-			"version": "3.11"
-		}
-	},
+  // Keep the same machine request
+  "hostRequirements": { "cpus": 4 },
 
-	"hostRequirements": {
-		"cpus": 4
-	},
-	"waitFor": "onCreateCommand",
-	"updateContentCommand": "python3 -m pip install -r requirements.txt",
-	// "postCreateCommand": "bash .devcontainer/post-create.sh",
-	"postCreateCommand": "python3 -m pip install --upgrade pip setuptools wheel && bash .devcontainer/post-create.sh",
-	"customizations": {
-		"codespaces": {
-			"openFiles": []
-		},
-		"vscode": {
-			"extensions": [
-				"ms-python.python",
-				"ms-toolsai.jupyter"
-			],
-			"postCreateCommand": [
-				"curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh",
-				"pip3 --disable-pip-version-check --no-cache-dir install -r requirements.txt"
-			]
-		}
-	}
+  "waitFor": "onCreateCommand",
+
+  // Speed + reliability: no cache, upgrade packaging tools, then your installs
+  "updateContentCommand": "env PIP_NO_CACHE_DIR=1 python -m pip install --upgrade pip setuptools wheel && python -m pip install -r requirements.txt",
+
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+
+  "customizations": {
+    "codespaces": { "openFiles": [] },
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-toolsai.jupyter"
+      ],
+      // Keep rustup if you truly need it, but minimize footprint
+      "postCreateCommand": [
+        "bash -lc \"command -v rustup >/dev/null || curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal\"",
+        "python -m pip --disable-pip-version-check --no-cache-dir install -r requirements.txt"
+      ]
+    }
+  }
 }
