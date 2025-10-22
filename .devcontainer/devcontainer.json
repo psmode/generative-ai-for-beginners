@@ -3,12 +3,21 @@
 {
 	"name": "Generative AI For Beginners",
 	"image": "mcr.microsoft.com/devcontainers/universal:2.11.2",
+
+	// ? NEW: Pin Python 3.11 (avoids distutils break on 3.12)
+	"features": {
+		"ghcr.io/devcontainers/features/python:1": {
+			"version": "3.11"
+		}
+	},
+
 	"hostRequirements": {
 		"cpus": 4
 	},
 	"waitFor": "onCreateCommand",
 	"updateContentCommand": "python3 -m pip install -r requirements.txt",
-	"postCreateCommand": "bash .devcontainer/post-create.sh",
+	// "postCreateCommand": "bash .devcontainer/post-create.sh",
+	"postCreateCommand": "python3 -m pip install --upgrade pip setuptools wheel && bash .devcontainer/post-create.sh",
 	"customizations": {
 		"codespaces": {
 			"openFiles": []
